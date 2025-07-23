@@ -75,7 +75,7 @@ export default function Home() {
           />
           <label
             htmlFor="resume-upload"
-                         className="bg-white text-blue-600 hover:bg-blue-100 transition-colors px-8 py-4 rounded-lg font-semibold text-lg shadow-lg flex items-center gap-2 cursor-pointer"
+            className="bg-white text-blue-600 hover:bg-blue-100 transition-colors px-8 py-4 rounded-lg font-semibold text-lg shadow-lg flex items-center gap-2 cursor-pointer"
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
