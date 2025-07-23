@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const runtime = 'edge';
+
+async function fileToBase64(file: File) {
+  const bytes = await file.arrayBuffer();
+  let binary = '';
+  const bytes_num = new Uint8Array(bytes);
+  const len = bytes_num.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes_num[i]);
+  }
+  return btoa(binary);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -12,9 +25,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert the file to base64
-    const buffer = await resume.arrayBuffer();
-    const base64String = Buffer.from(buffer).toString('base64');
+    // Convert the file to base64 without using Node's Buffer
+    const base64String = await fileToBase64(resume);
 
     // Send to n8n webhook
     const response = await fetch('https://primary-production-09d3.up.railway.app/webhook-test/match-resume', {
