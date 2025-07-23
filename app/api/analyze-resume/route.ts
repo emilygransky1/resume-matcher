@@ -44,12 +44,12 @@ export async function POST(request: Request) {
       fileName: payload.fileName,
       fileType: payload.fileType,
       fileSize: payload.fileSize,
-      url: 'https://primary-production-09d3.up.railway.app/webhook/match-resume'
+      url: 'https://primary-production-09d3.up.railway.app/webhook-test/match-resume'
     });
 
     // Send to n8n
     try {
-      const n8nResponse = await fetch('https://primary-production-09d3.up.railway.app/webhook/match-resume', {
+      const n8nResponse = await fetch('https://primary-production-09d3.up.railway.app/webhook-test/match-resume', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
