@@ -58,11 +58,11 @@ export default function Home() {
   };
 
   return (
-    <div className="font-sans min-h-screen p-8 bg-purple-500">
+    <div className="font-sans min-h-screen p-8 bg-blue-500">
       <main className="max-w-4xl mx-auto flex flex-col items-center gap-8 pt-16">
         <h1 className="text-4xl font-bold text-white mb-4">Resume Matcher</h1>
         <p className="text-white text-center text-lg mb-8">
-          Upload your resume and let our AI match you with the perfect job opportunities.
+          Upload resume to match against portfolio companies
         </p>
         
         <div className="flex flex-col items-center gap-4">
@@ -75,7 +75,7 @@ export default function Home() {
           />
           <label
             htmlFor="resume-upload"
-            className="bg-white text-purple-600 hover:bg-purple-100 transition-colors px-8 py-4 rounded-lg font-semibold text-lg shadow-lg flex items-center gap-2 cursor-pointer"
+                         className="bg-white text-blue-600 hover:bg-blue-100 transition-colors px-8 py-4 rounded-lg font-semibold text-lg shadow-lg flex items-center gap-2 cursor-pointer"
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
@@ -121,9 +121,9 @@ export default function Home() {
         <div className="mt-8 p-6 bg-white/10 rounded-lg backdrop-blur-sm text-white">
           <h2 className="text-xl font-semibold mb-4">How it works:</h2>
           <ol className="list-decimal list-inside space-y-2">
-            <li>Upload your resume in PDF or DOCX format</li>
-            <li>Our AI analyzes your skills and experience</li>
-            <li>Get matched with relevant job opportunities</li>
+            <li>Upload resume in PDF or DOCX format</li>
+            <li>System analyzes skills and experience</li>
+            <li>Match against portfolio company positions</li>
           </ol>
         </div>
       </main>
