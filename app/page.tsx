@@ -61,7 +61,7 @@ export default function Home() {
     <div className="font-sans min-h-screen p-8 bg-slate-800">
       <header className="w-full flex justify-center mb-8">
         <Image
-          src="/Inflection 1 — alt for dark backgrounds.png"
+          src="/inflecton-logo.png"
           alt="Inflection Logo"
           width={300}
           height={75}
