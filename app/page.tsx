@@ -61,9 +61,9 @@ export default function Home() {
     <div className="font-sans min-h-screen p-8 bg-slate-800">
       <header className="absolute top-8 left-8">
         <Image
-          src="/logo.png" // You'll need to add your logo file to the public directory
-          alt="Company Logo"
-          width={150}
+          src="/Inflection 1 — alt for dark backgrounds.png"
+          alt="Inflection Logo"
+          width={200}
           height={50}
           className="h-auto w-auto"
           priority
