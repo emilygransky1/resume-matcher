@@ -1,49 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
-async function fileToBase64(file: File) {
-  const bytes = await file.arrayBuffer();
-  let binary = '';
-  const bytes_num = new Uint8Array(bytes);
-  const len = bytes_num.byteLength;
-  for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes_num[i]);
-  }
-  return btoa(binary);
+type ResumeData = {
+  filename: string;
+  fileType: string;
+  fileSize: number;
+  content: string;
+};
+
+async function fileToBase64(file: Blob): Promise<string> {
+  const arrayBuffer = await file.arrayBuffer();
+  const uint8Array = new Uint8Array(arrayBuffer);
+  const binaryString = uint8Array.reduce((str, byte) => str + String.fromCharCode(byte), '');
+  return btoa(binaryString);
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const formData = await request.formData();
-    const resume = formData.get('resume') as File;
+    const file = formData.get('resume');
 
-    if (!resume) {
+    if (!file || !(file instanceof Blob)) {
       return NextResponse.json(
-        { error: 'No resume file provided' },
+        { error: 'No resume file provided or invalid file type' },
         { status: 400 }
       );
     }
 
-    // Convert the file to base64 without using Node's Buffer
-    const base64String = await fileToBase64(resume);
+    const base64String = await fileToBase64(file);
 
-    // Send to n8n webhook
+    const resumeData: ResumeData = {
+      filename: 'resume' in file ? file.name : 'unknown.pdf',
+      fileType: file.type || 'application/octet-stream',
+      fileSize: file.size,
+      content: base64String,
+    };
+
     const response = await fetch('https://primary-production-09d3.up.railway.app/webhook-test/match-resume', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        filename: resume.name,
-        fileType: resume.type,
-        fileSize: resume.size,
-        content: base64String,
-      }),
+      body: JSON.stringify(resumeData),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to analyze resume');
+      throw new Error(`Failed to analyze resume: ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -51,7 +55,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error processing resume:', error);
     return NextResponse.json(
-      { error: 'Failed to process resume' },
+      { error: error instanceof Error ? error.message : 'Failed to process resume' },
       { status: 500 }
     );
   }
