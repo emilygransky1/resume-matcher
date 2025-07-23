@@ -7,6 +7,7 @@ export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<any>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -21,6 +22,7 @@ export default function Home() {
 
     setFile(selectedFile);
     setError(null);
+    setResult(null);
   };
 
   const handleSubmit = async () => {
@@ -31,6 +33,7 @@ export default function Home() {
 
     setIsLoading(true);
     setError(null);
+    setResult(null);
 
     try {
       const formData = new FormData();
@@ -46,7 +49,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      // Handle successful response
+      setResult(data);
       console.log('Resume analysis:', data);
       
     } catch (err) {
@@ -125,6 +128,15 @@ export default function Home() {
             <p className="text-red-200 bg-red-500/20 px-4 py-2 rounded-lg">
               {error}
             </p>
+          )}
+
+          {result && (
+            <div className="mt-4 p-6 bg-white/10 rounded-lg text-white w-full max-w-2xl">
+              <h2 className="text-xl font-semibold mb-4">Analysis Results</h2>
+              <pre className="whitespace-pre-wrap overflow-auto">
+                {JSON.stringify(result, null, 2)}
+              </pre>
+            </div>
           )}
         </div>
 
