@@ -59,9 +59,10 @@ export default function Home() {
 
   return (
     <div className="font-sans min-h-screen p-8 bg-slate-800">
+      {/* Logo section - uncomment when logo file is added
       <header className="absolute top-8 left-8">
         <Image
-          src="/logo.png" // You'll need to add your logo file to the public directory
+          src="/logo.png"
           alt="Company Logo"
           width={150}
           height={50}
@@ -69,6 +70,7 @@ export default function Home() {
           priority
         />
       </header>
+      */}
       <main className="max-w-4xl mx-auto flex flex-col items-center gap-8 pt-16">
         <h1 className="text-4xl font-bold text-white mb-4">Resume Matcher</h1>
         <p className="text-white text-center text-lg mb-8">
