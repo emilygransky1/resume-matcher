@@ -58,7 +58,17 @@ export default function Home() {
   };
 
   return (
-    <div className="font-sans min-h-screen p-8 bg-blue-500">
+    <div className="font-sans min-h-screen p-8 bg-slate-800">
+      <header className="absolute top-8 left-8">
+        <Image
+          src="/logo.png" // You'll need to add your logo file to the public directory
+          alt="Company Logo"
+          width={150}
+          height={50}
+          className="h-auto w-auto"
+          priority
+        />
+      </header>
       <main className="max-w-4xl mx-auto flex flex-col items-center gap-8 pt-16">
         <h1 className="text-4xl font-bold text-white mb-4">Resume Matcher</h1>
         <p className="text-white text-center text-lg mb-8">
@@ -75,7 +85,7 @@ export default function Home() {
           />
           <label
             htmlFor="resume-upload"
-            className="bg-white text-blue-600 hover:bg-blue-100 transition-colors px-8 py-4 rounded-lg font-semibold text-lg shadow-lg flex items-center gap-2 cursor-pointer"
+            className="bg-white text-slate-800 hover:bg-slate-100 transition-colors px-8 py-4 rounded-lg font-semibold text-lg shadow-lg flex items-center gap-2 cursor-pointer"
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
