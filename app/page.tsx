@@ -24,14 +24,10 @@ export default function Home() {
     const selectedFile = event.target.files?.[0];
     if (!selectedFile) return;
 
-    // Check file type
+    // Check file type - PDF only
     const fileType = selectedFile.type;
-    console.log('Selected file type:', fileType);
-    console.log('Selected file name:', selectedFile.name);
-    console.log('Selected file size:', selectedFile.size);
-
-    if (!fileType.includes('pdf') && !fileType.includes('word') && !fileType.includes('document')) {
-      setError('Please upload a PDF or Word document');
+    if (!fileType.includes('pdf')) {
+      setError('Please upload a PDF file only');
       return;
     }
 
@@ -98,14 +94,17 @@ export default function Home() {
       </header>
       <main className="max-w-4xl mx-auto flex flex-col items-center gap-8">
         <h1 className="text-4xl font-bold text-white mb-4">Resume Matcher</h1>
-        <p className="text-white text-center text-lg mb-8">
-          Upload resume to match against portfolio companies
-        </p>
+        <div className="text-white text-center space-y-2">
+          <p className="text-lg">Upload your resume to match against portfolio companies</p>
+          <p className="text-sm bg-blue-500/20 px-4 py-2 rounded-lg inline-block">
+            Currently accepting PDF files only
+          </p>
+        </div>
         
         <div className="flex flex-col items-center gap-4">
           <input
             type="file"
-            accept=".pdf,.doc,.docx"
+            accept=".pdf,application/pdf"
             onChange={handleFileUpload}
             className="hidden"
             id="resume-upload"
@@ -128,7 +127,7 @@ export default function Home() {
                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
               />
             </svg>
-            {file ? 'Change Resume' : 'Select Resume'}
+            {file ? 'Change PDF Resume' : 'Select PDF Resume'}
           </label>
 
           {file && (
@@ -157,18 +156,11 @@ export default function Home() {
           {result?.success && result.matches && (
             <div className="mt-4 p-6 bg-white/10 rounded-lg text-white w-full max-w-2xl">
               <h2 className="text-xl font-semibold mb-4">Match Results</h2>
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {result.matches.map((match, index) => (
-                  <div key={index} className="p-4 bg-white/5 rounded">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="text-lg font-semibold">{match.company}</span>
-                      <span className="font-mono">{Math.round(match.score * 100)}% match</span>
-                    </div>
-                    {match.description && (
-                      <div className="prose prose-invert prose-sm mt-2">
-                        <ReactMarkdown>{match.description}</ReactMarkdown>
-                      </div>
-                    )}
+                  <div key={index} className="flex justify-between items-center p-2 bg-white/5 rounded">
+                    <span>{match.company}</span>
+                    <span className="font-mono">{Math.round(match.score * 100)}% match</span>
                   </div>
                 ))}
               </div>
@@ -179,7 +171,7 @@ export default function Home() {
         <div className="mt-8 p-6 bg-white/10 rounded-lg backdrop-blur-sm text-white">
           <h2 className="text-xl font-semibold mb-4">How it works:</h2>
           <ol className="list-decimal list-inside space-y-2">
-            <li>Upload resume in PDF or DOCX format</li>
+            <li>Upload your resume in PDF format</li>
             <li>System analyzes skills and experience</li>
             <li>Match against portfolio company positions</li>
           </ol>

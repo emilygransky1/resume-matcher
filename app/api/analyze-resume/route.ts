@@ -11,10 +11,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, message: 'No file uploaded' });
     }
 
+    // Enforce PDF only
+    if (!file.type.includes('pdf')) {
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Only PDF files are currently supported' 
+      });
+    }
+
     // Log file details
     const fileDetails = {
-      type: file instanceof File ? file.type : 'application/octet-stream',
-      name: file instanceof File ? file.name : 'unknown',
+      type: file instanceof File ? file.type : 'application/pdf',
+      name: file instanceof File ? file.name : 'resume.pdf',
       size: file.size
     };
     console.log('Received file:', fileDetails);
@@ -25,8 +33,8 @@ export async function POST(request: Request) {
     // Always send as a File with proper name and type
     const fileToSend = file instanceof File ? file : new File(
       [file],
-      'resume.docx',
-      { type: fileDetails.type }
+      'resume.pdf',
+      { type: 'application/pdf' }
     );
 
     // Add the file with the 'resume' field name
