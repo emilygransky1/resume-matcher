@@ -5,18 +5,19 @@ export const runtime = 'edge';
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const file = formData.get('resume');
+    const file = formData.get('resume') as File | null;
 
     if (!file || !(file instanceof Blob)) {
       return NextResponse.json({ success: false, message: 'No file uploaded' });
     }
 
     // Log file details
-    console.log('Received file:', {
-      type: file.type,
+    const fileDetails = {
+      type: file instanceof File ? file.type : 'application/octet-stream',
       name: file instanceof File ? file.name : 'unknown',
       size: file.size
-    });
+    };
+    console.log('Received file:', fileDetails);
 
     // Create a new FormData to send to n8n
     const n8nFormData = new FormData();
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
     const fileToSend = file instanceof File ? file : new File(
       [file],
       'resume.docx',
-      { type: file.type || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }
+      { type: fileDetails.type }
     );
 
     // Add the file with the 'resume' field name
