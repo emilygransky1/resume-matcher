@@ -61,7 +61,7 @@ export default function Home() {
     <div className="font-sans min-h-screen p-8 bg-slate-800">
       <header className="absolute top-8 left-8">
         <Image
-          src="/Inflection 1 — alt for dark backgrounds.png"
+          src="/Inflection%201%20%E2%80%94%20alt%20for%20dark%20backgrounds.png"
           alt="Inflection Logo"
           width={200}
           height={50}
