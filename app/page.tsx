@@ -1,103 +1,132 @@
+'use client';
+
+import { useState } from "react";
 import Image from "next/image";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 bg-purple-500">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-white/[.05] dark:bg-white/[.06] font-mono font-bold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [file, setFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (!selectedFile) return;
+
+    // Check file type
+    const fileType = selectedFile.type;
+    if (!fileType.includes('pdf') && !fileType.includes('word') && !fileType.includes('document')) {
+      setError('Please upload a PDF or Word document');
+      return;
+    }
+
+    setFile(selectedFile);
+    setError(null);
+  };
+
+  const handleSubmit = async () => {
+    if (!file) {
+      setError('Please select a file first');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('resume', file);
+
+      const response = await fetch('/api/analyze-resume', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze resume');
+      }
+
+      const data = await response.json();
+      // Handle successful response
+      console.log('Resume analysis:', data);
+      
+    } catch (err) {
+      setError('Failed to analyze resume. Please try again.');
+      console.error('Error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="font-sans min-h-screen p-8 bg-purple-500">
+      <main className="max-w-4xl mx-auto flex flex-col items-center gap-8 pt-16">
+        <h1 className="text-4xl font-bold text-white mb-4">Resume Matcher</h1>
+        <p className="text-white text-center text-lg mb-8">
+          Upload your resume and let our AI match you with the perfect job opportunities.
+        </p>
+        
+        <div className="flex flex-col items-center gap-4">
+          <input
+            type="file"
+            accept=".pdf,.doc,.docx"
+            onChange={handleFileUpload}
+            className="hidden"
+            id="resume-upload"
+          />
+          <label
+            htmlFor="resume-upload"
+            className="bg-white text-purple-600 hover:bg-purple-100 transition-colors px-8 py-4 rounded-lg font-semibold text-lg shadow-lg flex items-center gap-2 cursor-pointer"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-6 w-6" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
+            </svg>
+            {file ? 'Change Resume' : 'Select Resume'}
+          </label>
+
+          {file && (
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-white">
+                Selected file: {file.name}
+              </p>
+              <button
+                onClick={handleSubmit}
+                disabled={isLoading}
+                className={`bg-green-500 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-lg hover:bg-green-600 transition-colors ${
+                  isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {isLoading ? 'Analyzing...' : 'Submit for Analysis'}
+              </button>
+            </div>
+          )}
+
+          {error && (
+            <p className="text-red-200 bg-red-500/20 px-4 py-2 rounded-lg">
+              {error}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-8 p-6 bg-white/10 rounded-lg backdrop-blur-sm text-white">
+          <h2 className="text-xl font-semibold mb-4">How it works:</h2>
+          <ol className="list-decimal list-inside space-y-2">
+            <li>Upload your resume in PDF or DOCX format</li>
+            <li>Our AI analyzes your skills and experience</li>
+            <li>Get matched with relevant job opportunities</li>
+          </ol>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
