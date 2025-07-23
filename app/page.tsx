@@ -3,11 +3,20 @@
 import { useState } from "react";
 import Image from "next/image";
 
+interface ResumeResponse {
+  success: boolean;
+  message?: string;
+  matches?: Array<{
+    company: string;
+    score: number;
+  }>;
+}
+
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<ResumeResponse | null>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
@@ -48,9 +57,11 @@ export default function Home() {
         throw new Error('Failed to analyze resume');
       }
 
-      const data = await response.json();
+      const data: ResumeResponse = await response.json();
       setResult(data);
-      console.log('Resume analysis:', data);
+      if (!data.success) {
+        setError(data.message || 'Failed to analyze resume');
+      }
       
     } catch (err) {
       setError('Failed to analyze resume. Please try again.');
@@ -130,12 +141,17 @@ export default function Home() {
             </p>
           )}
 
-          {result && (
+          {result?.success && result.matches && (
             <div className="mt-4 p-6 bg-white/10 rounded-lg text-white w-full max-w-2xl">
-              <h2 className="text-xl font-semibold mb-4">Analysis Results</h2>
-              <pre className="whitespace-pre-wrap overflow-auto">
-                {JSON.stringify(result, null, 2)}
-              </pre>
+              <h2 className="text-xl font-semibold mb-4">Match Results</h2>
+              <div className="space-y-2">
+                {result.matches.map((match, index) => (
+                  <div key={index} className="flex justify-between items-center p-2 bg-white/5 rounded">
+                    <span>{match.company}</span>
+                    <span className="font-mono">{Math.round(match.score * 100)}% match</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
