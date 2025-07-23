@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import ReactMarkdown from 'react-markdown';
 
 interface ResumeResponse {
   success: boolean;
@@ -9,6 +10,7 @@ interface ResumeResponse {
   matches?: Array<{
     company: string;
     score: number;
+    description?: string;  // Added for markdown content
   }>;
 }
 
@@ -24,6 +26,10 @@ export default function Home() {
 
     // Check file type
     const fileType = selectedFile.type;
+    console.log('Selected file type:', fileType);
+    console.log('Selected file name:', selectedFile.name);
+    console.log('Selected file size:', selectedFile.size);
+
     if (!fileType.includes('pdf') && !fileType.includes('word') && !fileType.includes('document')) {
       setError('Please upload a PDF or Word document');
       return;
@@ -45,8 +51,11 @@ export default function Home() {
     setResult(null);
 
     try {
+      // Create form data with the file
       const formData = new FormData();
-      formData.append('resume', file);
+      formData.append('resume', file, file.name);
+
+      console.log('Sending file:', file.name, file.type, file.size);
 
       const response = await fetch('/api/analyze-resume', {
         method: 'POST',
@@ -54,17 +63,21 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze resume');
+        const errorText = await response.text();
+        console.error('Server error:', errorText);
+        throw new Error('Failed to analyze resume: ' + errorText);
       }
 
       const data: ResumeResponse = await response.json();
+      console.log('Server response:', data);
+      
       setResult(data);
       if (!data.success) {
         setError(data.message || 'Failed to analyze resume');
       }
       
     } catch (err) {
-      setError('Failed to analyze resume. Please try again.');
+      setError(err instanceof Error ? err.message : 'Failed to analyze resume. Please try again.');
       console.error('Error:', err);
     } finally {
       setIsLoading(false);
@@ -144,11 +157,18 @@ export default function Home() {
           {result?.success && result.matches && (
             <div className="mt-4 p-6 bg-white/10 rounded-lg text-white w-full max-w-2xl">
               <h2 className="text-xl font-semibold mb-4">Match Results</h2>
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {result.matches.map((match, index) => (
-                  <div key={index} className="flex justify-between items-center p-2 bg-white/5 rounded">
-                    <span>{match.company}</span>
-                    <span className="font-mono">{Math.round(match.score * 100)}% match</span>
+                  <div key={index} className="p-4 bg-white/5 rounded">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="text-lg font-semibold">{match.company}</span>
+                      <span className="font-mono">{Math.round(match.score * 100)}% match</span>
+                    </div>
+                    {match.description && (
+                      <div className="prose prose-invert prose-sm mt-2">
+                        <ReactMarkdown>{match.description}</ReactMarkdown>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
