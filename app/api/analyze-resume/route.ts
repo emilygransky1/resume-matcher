@@ -27,32 +27,34 @@ export async function POST(request: Request) {
     };
     console.log('Received file:', fileDetails);
 
-    // Create a new FormData to send to n8n
-    const n8nFormData = new FormData();
-    
-    // Always send as a File with proper name and type
-    const fileToSend = file instanceof File ? file : new File(
-      [file],
-      'resume.pdf',
-      { type: 'application/pdf' }
-    );
+    // Convert file to base64
+    const arrayBuffer = await file.arrayBuffer();
+    const base64String = Buffer.from(arrayBuffer).toString('base64');
 
-    // Add the file with the 'resume' field name
-    n8nFormData.append('resume', fileToSend);
+    // Prepare the data for n8n in a format it can better handle
+    const payload = {
+      fileName: file instanceof File ? file.name : 'resume.pdf',
+      fileType: file.type,
+      fileSize: file.size,
+      fileContent: base64String
+    };
 
-    // Log what we're sending
+    // Log what we're sending (excluding the base64 content for brevity)
     console.log('Sending to n8n:', {
-      fileName: fileToSend.name,
-      fileType: fileToSend.type,
-      fileSize: fileToSend.size,
-      url: 'https://primary-production-09d3.up.railway.app/webhook-test/match-resume'
+      fileName: payload.fileName,
+      fileType: payload.fileType,
+      fileSize: payload.fileSize,
+      url: 'https://primary-production-09d3.up.railway.app/webhook/match-resume'
     });
 
     // Send to n8n
     try {
-      const n8nResponse = await fetch('https://primary-production-09d3.up.railway.app/webhook-test/match-resume', {
+      const n8nResponse = await fetch('https://primary-production-09d3.up.railway.app/webhook/match-resume', {
         method: 'POST',
-        body: n8nFormData
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
       });
 
       console.log('n8n response status:', n8nResponse.status);
@@ -62,7 +64,9 @@ export async function POST(request: Request) {
         console.error('n8n error details:', {
           status: n8nResponse.status,
           statusText: n8nResponse.statusText,
-          error: errorText
+          error: errorText,
+          headers: Object.fromEntries(n8nResponse.headers.entries()),
+          url: n8nResponse.url
         });
         throw new Error(`Failed to process with n8n: ${n8nResponse.status} ${errorText}`);
       }
