@@ -30,6 +30,8 @@ export async function POST(request: Request) {
     // Create a new FormData to send to n8n
     const n8nFormData = new FormData();
     n8nFormData.append('resume', file);
+    n8nFormData.append('filename', file.name);
+    n8nFormData.append('contentType', file.type);
 
     // Log what we're sending
     console.log('Sending to n8n:', {
@@ -39,11 +41,17 @@ export async function POST(request: Request) {
       url: 'https://primary-production-09d3.up.railway.app/webhook-test/match-resume'
     });
 
-    // Send to n8n
+    // Send to n8n with specific headers
     try {
       const n8nResponse = await fetch('https://primary-production-09d3.up.railway.app/webhook-test/match-resume', {
         method: 'POST',
-        body: n8nFormData // Send the FormData directly
+        headers: {
+          'Accept': 'application/json',
+          'X-File-Name': file.name,
+          'X-File-Type': file.type,
+          'X-File-Size': file.size.toString()
+        },
+        body: n8nFormData
       });
 
       console.log('n8n response status:', n8nResponse.status);
