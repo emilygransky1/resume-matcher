@@ -81,102 +81,137 @@ export default function Home() {
   };
 
   return (
-    <div className="font-sans min-h-screen p-8 bg-slate-800">
-      <header className="w-full flex justify-center mb-8">
-        <Image
-          src="/inflecton-logo.png"
-          alt="Inflection Logo"
-          width={300}
-          height={75}
-          className="h-auto w-auto"
-          priority
-        />
-      </header>
-      <main className="max-w-4xl mx-auto flex flex-col items-center gap-8">
-        <h1 className="text-4xl font-bold text-white mb-4">Resume Matcher</h1>
-        <div className="text-white text-center space-y-2">
-          <p className="text-lg">Upload your resume to match against portfolio companies</p>
-          <p className="text-sm bg-blue-500/20 px-4 py-2 rounded-lg inline-block">
-            Currently accepting PDF files only
-          </p>
-        </div>
-        
-        <div className="flex flex-col items-center gap-4">
-          <input
-            type="file"
-            accept=".pdf,application/pdf"
-            onChange={handleFileUpload}
-            className="hidden"
-            id="resume-upload"
+    <div className="font-sans min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+      <div className="max-w-6xl mx-auto p-8">
+        <header className="w-full flex justify-center mb-12 animate-fade-in">
+          <Image
+            src="/inflecton-logo.png"
+            alt="Inflection Logo"
+            width={300}
+            height={75}
+            className="h-auto w-auto hover:opacity-90 transition-opacity"
+            priority
           />
-          <label
-            htmlFor="resume-upload"
-            className="bg-white text-slate-800 hover:bg-slate-100 transition-colors px-8 py-4 rounded-lg font-semibold text-lg shadow-lg flex items-center gap-2 cursor-pointer"
-          >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-6 w-6" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
+        </header>
+        
+        <main className="max-w-4xl mx-auto flex flex-col items-center gap-12">
+          <div className="text-center space-y-4 animate-fade-in-up">
+            <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">Resume Matcher</h1>
+            <p className="text-xl text-slate-300">Upload your resume to match against portfolio companies</p>
+            <div className="inline-flex items-center gap-2 bg-blue-500/20 px-6 py-3 rounded-xl text-blue-300 border border-blue-500/30">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+              </svg>
+              <span>Currently accepting PDF files only</span>
+            </div>
+          </div>
+          
+          <div className="flex flex-col items-center gap-6 w-full max-w-2xl animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <input
+              type="file"
+              accept=".pdf,application/pdf"
+              onChange={handleFileUpload}
+              className="hidden"
+              id="resume-upload"
+            />
+            <label
+              htmlFor="resume-upload"
+              className="group bg-white text-slate-800 hover:bg-slate-100 transition-all duration-200 px-8 py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl flex items-center gap-3 cursor-pointer border-2 border-transparent hover:border-slate-200"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-              />
-            </svg>
-            {file ? 'Change PDF Resume' : 'Select PDF Resume'}
-          </label>
-
-          {file && (
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-white">
-                Selected file: {file.name}
-              </p>
-              <button
-                onClick={handleSubmit}
-                disabled={isLoading}
-                className={`bg-green-500 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-lg hover:bg-green-600 transition-colors ${
-                  isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-6 w-6 text-slate-600 group-hover:text-slate-800 transition-colors" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
               >
-                {isLoading ? 'Analyzing...' : 'Submit for Analysis'}
-              </button>
-            </div>
-          )}
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                />
+              </svg>
+              {file ? 'Change PDF Resume' : 'Select PDF Resume'}
+            </label>
 
-          {error && (
-            <p className="text-red-200 bg-red-500/20 px-4 py-2 rounded-lg">
-              {error}
-            </p>
-          )}
-
-          {result?.success && result.matches && (
-            <div className="mt-4 p-6 bg-white/10 rounded-lg text-white w-full max-w-2xl">
-              <h2 className="text-xl font-semibold mb-4">Match Results</h2>
-              <div className="space-y-2">
-                {result.matches.map((match, index) => (
-                  <div key={index} className="flex justify-between items-center p-2 bg-white/5 rounded">
-                    <span>{match.company}</span>
-                    <span className="font-mono">{Math.round(match.score * 100)}% match</span>
-                  </div>
-                ))}
+            {file && (
+              <div className="flex flex-col items-center gap-4 animate-fade-in">
+                <div className="flex items-center gap-3 text-slate-300 bg-slate-700/50 px-4 py-2 rounded-lg">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                  </svg>
+                  <span>{file.name}</span>
+                </div>
+                <button
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                  className={`bg-green-500 text-white px-8 py-3 rounded-xl font-semibold text-lg shadow-lg hover:bg-green-600 transition-all duration-200 hover:shadow-xl ${
+                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {isLoading ? (
+                    <div className="flex items-center gap-3">
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Analyzing Resume...</span>
+                    </div>
+                  ) : 'Submit for Analysis'}
+                </button>
               </div>
-            </div>
-          )}
-        </div>
+            )}
 
-        <div className="mt-8 p-6 bg-white/10 rounded-lg backdrop-blur-sm text-white">
-          <h2 className="text-xl font-semibold mb-4">How it works:</h2>
-          <ol className="list-decimal list-inside space-y-2">
-            <li>Upload your resume in PDF format</li>
-            <li>System analyzes skills and experience</li>
-            <li>Match against portfolio company positions</li>
-          </ol>
-        </div>
-      </main>
+            {error && (
+              <div className="flex items-center gap-2 text-red-200 bg-red-500/20 px-6 py-3 rounded-xl border border-red-500/30 animate-fade-in">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>{error}</span>
+              </div>
+            )}
+
+            {result?.success && result.matches && (
+              <div className="w-full p-6 bg-white/10 rounded-xl border border-white/20 backdrop-blur-sm text-white animate-fade-in">
+                <h2 className="text-2xl font-semibold mb-6">Match Results</h2>
+                <div className="space-y-3">
+                  {result.matches.map((match, index) => (
+                    <div 
+                      key={index} 
+                      className="flex justify-between items-center p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <span className="text-lg">{match.company}</span>
+                      <span className="font-mono text-lg bg-white/20 px-3 py-1 rounded-lg">
+                        {Math.round(match.score * 100)}% match
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="w-full max-w-2xl p-8 bg-white/10 rounded-xl border border-white/20 backdrop-blur-sm text-white animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+            <h2 className="text-2xl font-semibold mb-6">How it works:</h2>
+            <ol className="list-none space-y-4">
+              <li className="flex items-center gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-500/30">1</div>
+                <span>Upload your resume in PDF format</span>
+              </li>
+              <li className="flex items-center gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-500/30">2</div>
+                <span>System analyzes skills and experience</span>
+              </li>
+              <li className="flex items-center gap-4">
+                <div className="flex-shrink-0 w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-500/30">3</div>
+                <span>Match against portfolio companies</span>
+              </li>
+            </ol>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
