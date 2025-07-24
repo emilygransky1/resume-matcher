@@ -27,23 +27,15 @@ export async function POST(request: Request) {
     };
     console.log('Received file:', fileDetails);
 
-    // Convert file to base64
-    const arrayBuffer = await file.arrayBuffer();
-    const base64String = Buffer.from(arrayBuffer).toString('base64');
+    // Create a new FormData to send to n8n
+    const n8nFormData = new FormData();
+    n8nFormData.append('resume', file);
 
-    // Prepare the data for n8n in a format it can better handle
-    const payload = {
-      fileName: file instanceof File ? file.name : 'resume.pdf',
-      fileType: file.type,
-      fileSize: file.size,
-      fileContent: base64String
-    };
-
-    // Log what we're sending (excluding the base64 content for brevity)
+    // Log what we're sending
     console.log('Sending to n8n:', {
-      fileName: payload.fileName,
-      fileType: payload.fileType,
-      fileSize: payload.fileSize,
+      fileName: fileDetails.name,
+      fileType: fileDetails.type,
+      fileSize: fileDetails.size,
       url: 'https://primary-production-09d3.up.railway.app/webhook-test/match-resume'
     });
 
@@ -51,10 +43,7 @@ export async function POST(request: Request) {
     try {
       const n8nResponse = await fetch('https://primary-production-09d3.up.railway.app/webhook-test/match-resume', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
+        body: n8nFormData // Send the FormData directly
       });
 
       console.log('n8n response status:', n8nResponse.status);
