@@ -1,5 +1,4 @@
-'use client';
-
+// Enhanced resume matcher with detailed results display
 import { useState } from "react";
 import Image from "next/image";
 import ReactMarkdown from 'react-markdown';
