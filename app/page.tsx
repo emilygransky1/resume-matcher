@@ -4,14 +4,149 @@ import { useState } from "react";
 import Image from "next/image";
 import ReactMarkdown from 'react-markdown';
 
+interface CompanyMatch {
+  company: string;
+  score: number;
+  description?: string;
+  reasonsForMatch?: string[];
+}
+
+interface ResumeAnalysis {
+  summary: string;
+  industries: string[];
+  modalities: string[];
+  companyStages: string[];
+  keySkills: string[];
+}
+
 interface ResumeResponse {
   success: boolean;
   message?: string;
-  matches?: Array<{
-    company: string;
-    score: number;
-    description?: string;  // Added for markdown content
-  }>;
+  analysis?: ResumeAnalysis;
+  matches?: CompanyMatch[];
+}
+
+function ResultsDisplay({ analysis, matches }: { analysis?: ResumeAnalysis; matches?: CompanyMatch[] }) {
+  if (!analysis || !matches) return null;
+
+  return (
+    <div className="w-full space-y-8 animate-fade-in">
+      {/* Candidate Summary Section */}
+      <div className="bg-white/10 rounded-xl border border-white/20 p-6 space-y-4">
+        <h2 className="text-2xl font-semibold text-white">Candidate Profile</h2>
+        <div className="prose prose-invert max-w-none">
+          <p className="text-slate-300">{analysis.summary}</p>
+        </div>
+        
+        {/* Skills Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <div className="space-y-2">
+            <h3 className="text-lg font-medium text-white">Industries</h3>
+            <div className="flex flex-wrap gap-2">
+              {analysis.industries.map((industry, i) => (
+                <span key={i} className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm border border-blue-500/30">
+                  {industry}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-lg font-medium text-white">Modalities</h3>
+            <div className="flex flex-wrap gap-2">
+              {analysis.modalities.map((modality, i) => (
+                <span key={i} className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm border border-purple-500/30">
+                  {modality}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-lg font-medium text-white">Preferred Company Stages</h3>
+            <div className="flex flex-wrap gap-2">
+              {analysis.companyStages.map((stage, i) => (
+                <span key={i} className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-sm border border-green-500/30">
+                  {stage}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Company Matches Section */}
+      <div className="bg-white/10 rounded-xl border border-white/20 p-6">
+        <h2 className="text-2xl font-semibold text-white mb-6">Company Matches</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b border-white/10">
+                <th className="text-left py-3 px-4 text-slate-300 font-medium">Company</th>
+                <th className="text-center py-3 px-4 text-slate-300 font-medium">Match Score</th>
+                <th className="text-left py-3 px-4 text-slate-300 font-medium">Why This Match?</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/10">
+              {matches.map((match, index) => (
+                <tr 
+                  key={index}
+                  className="hover:bg-white/5 transition-colors"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <td className="py-4 px-4">
+                    <div className="font-medium text-white">{match.company}</div>
+                  </td>
+                  <td className="py-4 px-4 text-center">
+                    <div className="inline-flex items-center justify-center">
+                      <div className="relative w-16 h-16">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-lg font-semibold text-white">
+                            {Math.round(match.score * 100)}%
+                          </span>
+                        </div>
+                        <svg className="transform -rotate-90 w-16 h-16">
+                          <circle
+                            className="text-white/10"
+                            strokeWidth="4"
+                            stroke="currentColor"
+                            fill="transparent"
+                            r="30"
+                            cx="32"
+                            cy="32"
+                          />
+                          <circle
+                            className="text-blue-500"
+                            strokeWidth="4"
+                            strokeDasharray={188.5}
+                            strokeDashoffset={188.5 - (match.score * 188.5)}
+                            strokeLinecap="round"
+                            stroke="currentColor"
+                            fill="transparent"
+                            r="30"
+                            cx="32"
+                            cy="32"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-4 px-4">
+                    <div className="text-slate-300">
+                      {match.reasonsForMatch?.map((reason, i) => (
+                        <div key={i} className="flex items-start gap-2 mb-1">
+                          <span className="text-green-400 mt-1">•</span>
+                          <span>{reason}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function Home() {
@@ -172,24 +307,11 @@ export default function Home() {
               </div>
             )}
 
-            {result?.success && result.matches && (
-              <div className="w-full p-6 bg-white/10 rounded-xl border border-white/20 backdrop-blur-sm text-white animate-fade-in">
-                <h2 className="text-2xl font-semibold mb-6">Match Results</h2>
-                <div className="space-y-3">
-                  {result.matches.map((match, index) => (
-                    <div 
-                      key={index} 
-                      className="flex justify-between items-center p-4 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <span className="text-lg">{match.company}</span>
-                      <span className="font-mono text-lg bg-white/20 px-3 py-1 rounded-lg">
-                        {Math.round(match.score * 100)}% match
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {result?.success && (
+              <ResultsDisplay 
+                analysis={result.analysis} 
+                matches={result.matches}
+              />
             )}
           </div>
 
